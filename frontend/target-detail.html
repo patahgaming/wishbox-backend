@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Detail</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-name {
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .logout-btn, .back-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .back-btn {
+            background-color: #555;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: #fdecea;
+            color: #dc3545;
+            display: block;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .detail-info {
+            margin-bottom: 20px;
+        }
+
+        .detail-info p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .detail-info span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .grid-cell {
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .grid-cell.done-yes {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .grid-cell.done-no {
+            background-color: #ffebee;
+            border-left: 4px solid #c62828;
+        }
+
+        .grid-cell p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .grid-cell .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .grid-cell .status {
+            font-size: 12px;
+            padding: 3px 6px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .grid-cell .status.done-yes {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .grid-cell .status.done-no {
+            background-color: #c62828;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .countdown {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Target Detail</h1>
+            <div class="user-info">
+                <span class="user-name" id="username">Loading...</span>
+                <button class="back-btn" onclick="goBack()">Back</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="card">
+            <div class="detail-header">
+                <h2>Target Information</h2>
+                <div class="countdown" id="countdown"></div>
+            </div>
+            
+            <div class="detail-info" id="detailInfo">
+                <!-- Detail info will be inserted here -->
+            </div>
+
+            <h3>Target Cells</h3>
+            <div id="gridContainer" class="grid-container">
+                <!-- Grid cells will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if token exists, if not redirect to login
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Get target ID from URL query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const id_target_detail = urlParams.get('id_target_detail');
+            
+            if (!id_target_detail) {
+                showAlert('Target ID is required', 'error');
+                return;
+            }
+            
+            // Fetch profile to display username
+            fetchProfile();
+            
+            // Fetch target details
+            fetchTargetDetail(id_target_detail);
+        });
+
+        // Show alert messages
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            setTimeout(() => {
+                alertBox.className = 'alert';
+            }, 5000);
+        }
+
+        // Fetch user profile
+        async function fetchProfile() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('username').textContent = data.name;
+                } else {
+                    // If profile fetch fails, token might be invalid
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                showAlert('Failed to fetch profile', 'error');
+            }
+        }
+
+        // Fetch target detail
+        async function fetchTargetDetail(id_target_detail) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch(`http://localhost:3001/api/target/get-detail?id_target_detail=${id_target_detail}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length > 0) {
+                        renderTargetDetail(data[0]);
+                    } else {
+                        showEmptyState('Target not found');
+                    }
+                } else {
+                    // Handle error responses
+                    const error = await response.json();
+                    showAlert(error.message || 'Failed to fetch target detail', 'error');
+                }
+            } catch (err) {
+                showAlert('Failed to connect to server', 'error');
+            }
+        }
+
+        // Render target detail information
+        function renderTargetDetail(detail) {
+            // Render basic info
+            const detailInfo = document.getElementById('detailInfo');
+            detailInfo.innerHTML = `
+                <p>ID: <span>${detail.id_target_detail}</span></p>
+                <p>Created At: <span>${formatDate(detail.create_at)}</span></p>
+                <p>Grid Size: <span>${detail.config.header.size.width} x ${detail.config.header.size.height}</span></p>
+                <p>Total Cells: <span>${detail.config.header.totalcells}</span></p>
+                <p>End Date: <span>${formatDate(detail.config.header.maximum_time)}</span></p>
+            `;
+            
+            // Setup countdown timer if maximum_time is in the future
+            setupCountdown(detail.config.header.maximum_time);
+            
+            // Render grid cells
+            renderGridCells(detail.config);
+        }
+
+        // Render grid cells
+        function renderGridCells(config) {
+            const gridContainer = document.getElementById('gridContainer');
+            const { width, height } = config.header.size;
+            
+            // Set grid template
+            gridContainer.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+            
+            // Clear existing content
+            gridContainer.innerHTML = '';
+            
+            // Add cells
+            const cells = config.cells || {};
+            for (let i = 1; i <= config.header.totalcells; i++) {
+                const cell = cells[i] || { title: 'Empty Cell', done: 'no' };
+                
+                const cellElement = document.createElement('div');
+                cellElement.className = `grid-cell done-${cell.done}`;
+                cellElement.innerHTML = `
+                    <p class="title">${cell.title}</p>
+                    <p>
+                        <span class="status done-${cell.done}">
+                            ${cell.done === 'yes' ? 'Completed' : 'Pending'}
+                        </span>
+                    </p>
+                `;
+                
+                gridContainer.appendChild(cellElement);
+            }
+        }
+
+        // Setup countdown timer
+        function setupCountdown(endDateStr) {
+            const countdownElement = document.getElementById('countdown');
+            const endDate = new Date(endDateStr);
+            
+            // Check if end date is in the past
+            if (endDate < new Date()) {
+                countdownElement.textContent = 'Time Expired!';
+                countdownElement.style.color = '#c62828';
+                return;
+            }
+            
+            // Update countdown every second
+            function updateCountdown() {
+                const now = new Date();
+                const diff = endDate - now;
+                
+                if (diff <= 0) {
+                    countdownElement.textContent = 'Time Expired!';
+                    countdownElement.style.color = '#c62828';
+                    return;
+                }
+                
+                // Calculate time components
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                countdownElement.textContent = `Time Remaining: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+            
+            // Initial call
+            updateCountdown();
+            
+            // Set interval for countdown
+            setInterval(updateCountdown, 1000);
+        }
+
+        // Format date for display
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        }
+
+        // Show empty state message
+        function showEmptyState(message) {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>${message}</h3>
+                    <p>Please check if the target ID is correct</p>
+                </div>
+            `;
+            
+            // Clear detail info
+            document.getElementById('detailInfo').innerHTML = '';
+            document.getElementById('countdown').textContent = '';
+        }
+
+        // Go back to the previous page
+        function goBack() {
+            window.history.back();
+        }
+
+        // Handle logout
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

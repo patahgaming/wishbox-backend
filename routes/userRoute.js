@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../models/db'); // Koneksi ke MySQL
 const { verifyToken } = require('../middleware');
+const AuthController = require('../controllers/userController');
 require('dotenv').config();
 
 // Register
@@ -36,47 +37,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
-  console.log("Incoming request body:", req.body); // Debugging
-
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
-
-  try {
-    // Dapatkan koneksi database
-    const connection = await db.getConnection();
-    
-    // Cari user berdasarkan email
-    const sql = 'SELECT * FROM users WHERE email = ?';
-    const [results] = await connection.execute(sql, [email]);
-    
-    // Lepaskan koneksi setelah query selesai
-    connection.release();
-
-    if (results.length === 0) {
-      return res.status(401).json({ message: 'User not found' });
-    }
-
-    const user = results[0];
-    
-    // Bandingkan password dengan bcrypt
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    // Buat token JWT
-    const token = jwt.sign({ id_user: user.id_user }, process.env.JWT_SECRET, { expiresIn: '69h' });
-
-    res.json({ token });
-
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ message: 'Error logging in', error: error.code });
-  }
-});
+router.post('/login', AuthController.login);
 
 
 
