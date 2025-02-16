@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-name {
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .filter-btn {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        .reset-btn {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .targets-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .targets-table th,
+        .targets-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .targets-table th {
+            background-color: #f1f1f1;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .targets-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .targets-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .targets-table .id-column {
+            width: 80px;
+        }
+
+        .visible-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .visible-true {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .visible-false {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: #fdecea;
+            color: #dc3545;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Target Management</h1>
+            <div class="user-info">
+                <span class="user-name" id="username">Loading...</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="card">
+            <h2>Filter Targets</h2>
+            <div class="filter-section">
+                <div class="filter-item">
+                    <label for="id_target">Target ID</label>
+                    <input type="text" id="id_target" placeholder="Enter target ID">
+                </div>
+                <div class="filter-item">
+                    <label for="permit_user">Permit User</label>
+                    <input type="text" id="permit_user" placeholder="Enter permit user">
+                </div>
+                <div class="filter-item">
+                    <label for="permit_visible">Visibility</label>
+                    <select id="permit_visible">
+                        <option value="">All</option>
+                        <option value="true">Visible</option>
+                        <option value="false">Hidden</option>
+                    </select>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="reset-btn" onclick="resetFilters()">Reset</button>
+                <button class="filter-btn" onclick="fetchTargets()">Apply Filters</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Targets</h2>
+            <div id="targets-container">
+                <!-- Table will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if token exists, if not redirect to login
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Fetch profile to display username
+            fetchProfile();
+            
+            // Initial fetch of targets
+            fetchTargets();
+        });
+
+        // Show alert messages
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            setTimeout(() => {
+                alertBox.className = 'alert';
+            }, 5000);
+        }
+
+        // Fetch user profile
+        async function fetchProfile() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('username').textContent = data.name;
+                } else {
+                    // If profile fetch fails, token might be invalid
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                showAlert('Failed to fetch profile', 'error');
+            }
+        }
+
+        // Fetch targets with optional filters
+        async function fetchTargets() {
+            const token = localStorage.getItem('token');
+            
+            // Build query string from filters
+            const id_target = document.getElementById('id_target').value;
+            const permit_user = document.getElementById('permit_user').value;
+            const permit_visible = document.getElementById('permit_visible').value;
+            
+            let queryParams = [];
+            
+            if (id_target) queryParams.push(`id_target=${id_target}`);
+            if (permit_user) queryParams.push(`permit_user=${permit_user}`);
+            if (permit_visible) queryParams.push(`permit_visible=${permit_visible}`);
+            
+            const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+            
+            try {
+                const response = await fetch(`http://localhost:3001/api/target/get-with-permit${queryString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTargetsTable(data);
+                } else {
+                    // Handle error responses
+                    const error = await response.json();
+                    showAlert(error.message || 'Failed to fetch targets', 'error');
+                }
+            } catch (err) {
+                showAlert('Failed to connect to server', 'error');
+            }
+        }
+
+        // Render the targets table
+        function renderTargetsTable(targets) {
+            const container = document.getElementById('targets-container');
+            
+            if (targets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No targets found</h3>
+                        <p>Try adjusting your filters or create new targets</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get all possible columns from the targets
+            const allColumns = new Set();
+            targets.forEach(target => {
+                Object.keys(target).forEach(key => allColumns.add(key));
+            });
+            
+            // Create table header
+            let tableHTML = `
+                <table class="targets-table">
+                    <thead>
+                        <tr>
+                            <th class="id-column">ID</th>
+                            <th>Bound To</th>
+                            <th>Permit User</th>
+                            <th>Visibility</th>
+                            ${Array.from(allColumns)
+                                .filter(col => !['id_target', 'bound_to', 'permit_user', 'permit_visible'].includes(col))
+                                .map(col => `<th>${formatColumnName(col)}</th>`)
+                                .join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Add table rows
+            targets.forEach(target => {
+                tableHTML += `
+                    <tr>
+                        <td>${target.id_target || '-'}</td>
+                        <td>${target.bound_to || '-'}</td>
+                        <td>${target.permit_user || '-'}</td>
+                        <td>
+                            <span class="visible-badge ${target.permit_visible ? 'visible-true' : 'visible-false'}">
+                                ${target.permit_visible ? 'Visible' : 'Hidden'}
+                            </span>
+                        </td>
+                        ${Array.from(allColumns)
+                            .filter(col => !['id_target', 'bound_to', 'permit_user', 'permit_visible'].includes(col))
+                            .map(col => `<td>${target[col] !== undefined ? target[col] : '-'}</td>`)
+                            .join('')}
+                    </tr>
+                `;
+            });
+            
+            // Close table
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+
+        // Format column names for display (convert snake_case to Title Case)
+        function formatColumnName(name) {
+            return name
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        // Reset all filters
+        function resetFilters() {
+            document.getElementById('id_target').value = '';
+            document.getElementById('permit_user').value = '';
+            document.getElementById('permit_visible').value = '';
+            fetchTargets();
+        }
+
+        // Handle logout
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

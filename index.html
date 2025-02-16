@@ -1,0 +1,329 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication System</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Card container styles */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Tab styles */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .tab-button.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+
+        /* Form styles */
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #1a73e8;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .alert.error {
+            background-color: #fdecea;
+            color: #dc3545;
+            display: block;
+        }
+
+        .alert.success {
+            background-color: #e8f5e9;
+            color: #28a745;
+            display: block;
+        }
+
+        /* Profile section styles */
+        #profileSection {
+            display: none;
+        }
+
+        .profile-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .profile-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Authentication Forms -->
+        <div id="authForms">
+            <h1 class="card-title">Authentication</h1>
+            
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('login')">Login</button>
+                <button class="tab-button" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="form-container active">
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <input type="text" id="loginName" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="form-container">
+                <form onsubmit="handleRegister(event)">
+                    <div class="input-group">
+                        <input type="text" id="registerName" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="registerPassword" placeholder="Password" required>
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+
+            <div id="alertBox" class="alert"></div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection">
+            <div class="profile-info">
+                <h2>User Profile</h2>
+                <p id="profileName"></p>
+                <p id="profileId"></p>
+            </div>
+            <button onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to switch between login and register tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update form visibility
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(`${tab}Form`).classList.add('active');
+        }
+
+        // Function to show alerts
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            setTimeout(() => {
+                alertBox.className = 'alert';
+            }, 5000);
+        }
+
+        // Function to handle registration
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const registerData = {
+                name: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3001/api/user/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registerData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Registration successful! Please login.', 'success');
+                    event.target.reset();
+                    switchTab('login');
+                } else {
+                    showAlert(data.message || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                showAlert('Failed to connect to server', 'error');
+            }
+        }
+
+        // Function to handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const loginData = {
+                name: document.getElementById('loginName').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch('http://localhost:3001/api/user/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    await fetchProfile();
+                } else {
+                    showAlert(data.message || 'Login failed', 'error');
+                }
+            } catch (err) {
+                showAlert('Failed to connect to server', 'error');
+            }
+        }
+
+        // Function to fetch user profile
+        async function fetchProfile() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const response = await fetch('http://localhost:3001/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('profileName').textContent = `Username: ${data.name}`;
+                    document.getElementById('profileId').textContent = `User ID: ${data.id_user}`;
+                    document.getElementById('authForms').style.display = 'none';
+                    document.getElementById('profileSection').style.display = 'block';
+                } else {
+                    localStorage.removeItem('token');
+                }
+            } catch (err) {
+                showAlert('Failed to fetch profile', 'error');
+                localStorage.removeItem('token');
+            }
+        }
+
+        // Function to handle logout
+        function handleLogout() {
+            localStorage.removeItem('token');
+            document.getElementById('authForms').style.display = 'block';
+            document.getElementById('profileSection').style.display = 'none';
+        }
+
+        // Check for existing token on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProfile();
+        });
+    </script>
+</body>
+</html>
