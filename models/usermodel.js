@@ -1,5 +1,5 @@
 const db = require('./db'); // Adjust path as needed
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 class UserModel {
   static async findByEmail(email) {
