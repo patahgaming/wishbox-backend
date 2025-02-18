@@ -1,4 +1,4 @@
-const TargetModel = require('./../models/targetmodel');
+const TargetModel = require('../models/targetModel');
 
 class TargetController {
   static async createTarget(req, res) {
