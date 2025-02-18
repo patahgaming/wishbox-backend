@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const db = require('./../models/db'); // Koneksi ke MySQL
 const { verifyToken } = require('./../middleware');
 const AuthController = require('./../controllers/userController');
