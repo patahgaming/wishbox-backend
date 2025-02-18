@@ -106,5 +106,5 @@ WHERE ${conditions.join(' AND ')}
   }
   
 }
-
+//yes
 module.exports = TargetModel;

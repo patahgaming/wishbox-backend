@@ -1,5 +1,5 @@
 const TargetModel = require('../models/targetModel');
-
+//yes
 class TargetController {
   static async createTarget(req, res) {
     const { target, bound_to, permit_user, permit_visible } = req.body;

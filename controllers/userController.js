@@ -1,6 +1,6 @@
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-
+//yes
 class AuthController {
   static async login(req, res) {
     console.log("Incoming request body:", req.body); // Debugging
