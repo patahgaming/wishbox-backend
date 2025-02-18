@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Card Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body {
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    border-radius: 20px;
+  }
+
+  .navbar {
+    background-color: #0d254f !important;
+    padding: 15px0;
+  }
+
+  .navbar .nav-link {
+    color: white !important;
+}
+
+.navbar .nav-link.active {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+}
+
+.paper {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    height: 200px;
+    margin-top: -5px;
+}
+
+.paper::after {
+    border-radius: 20px;
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: white;
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    z-index: 10;
+}
+ 
+.navbar .nav-link {
+color: white;
+text-decoration: none !important;
+}
+
+.button {
+  background-color: blue;
+  width: 100%;
+  height: 100%;
+}
+
+.card-wish {
+  margin-top: 8rem;
+}
+
+#btn {
+  box-shadow: 0px 2px 3px black;
+}
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-3" style="width: 100%;">
+        <div class="container width: 100%;">
+          <a class="navbar-brand d-flex align-item-center" href="#">
+            <img src="logo_transparent[1].png" alt="Logo" width="50" height="50" class="me-2">
+            <a class="nav-link text-white fw-bold" href="#">My Dream Cards</a>
+          </a>
+    
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+    
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item">
+                <a class="nav-link"  href="landing page.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="dreamcardgenerator.html">Dream Card Generator</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="templates.html">Templates</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="about.html">About Us</a>
+              </li>
+            </ul>
+    
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="login.html">Log In</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="container mt-5">
+        <p class="fs-4 fw-bold">Buat Dream Card-mu Sendiri!</p>
+        <br>
+            <p class="fs-6 mb-0">Siap membuat wishlist impianmu? Dengan <span class="text-red">Dream Card Generator</span>, kamu bisa membuat dan menyusun daftar impian secara virtual atau mencetaknya dalam format PDF jika ingin menyimpannya secara fisik.</p>
+            <br>
+            <p class="fs-6 mb-0">Setiap Dream Card akan diacak agar tampil unik dan menarik. Kamu bisa menyesuaikan tema, judul, dan isi wishlist sesuai keinginan sebelum melanjutkan.</p>
+            <p class="fs-6 mb-0">Kamu bisa menyesuaikan tema, judul, dan isi wishlist sesuai keinginan sebelum melanjutkan.</p>
+            <br>
+                <p class="fs-6 mb-0"><p class="fs-6 mb-0">Kamu bisa menyesuaikan tema, judul, dan isi wishlist sesuai keinginan sebelum melanjutkan.</p></p>
+          </div>
+
+          <div  class="container mt-5 d-flex align-item-center">
+
+          </div>
+          
+          <div class="container mt-5 d-flex align-item-center">
+            <img src="Screenshot 2025-02-14 223202.png" class="img-thumbnail me-3" alt="templat" width="35%" height="35%" > 
+            <div style="width: 50%; margin-left: 50px;" class="card-wish">
+              <p class="fs-5 fw-bold mb-0">Generator Wishlist Dream Card Gratis</p>
+              <br>
+              <button id="btn" class="btn  mt-3 w-100" style="background-color: rgb(72, 154, 187); color: white; width: 100%;">Unduh Dream Card (Tanpa Cetak)</button>
+              <div class="container mt-2">
+                <p class="text-muted fs-6" style="text-align: center;">📱 Simpan PDF untuk digunakan secara digital.</p>
+              </div>
+              <br>
+              <button id="btn" class="btn btn-danger mt-3 w-100">Unduh & Cetak Dream Card</button>
+              <div class="container mt-2"></div>
+              <p class="text-muted fs-6" style="text-align: center;">📱Simpan PDF untuk digunakan secara digital.</p>
+              <div class="container mt-5">
+            <p class="fs-6 mb-0" style="text-align: center;">Ingin mengubah Dream Card-mu? <a href="dreamcardgenerator.html" style="color: rgb(255, 77, 0); text-decoration: none;">Edit disini!</a></p>
+            
+            </div>
+            
+          </div>
+          </div>
+          
+          <br>
+
+          <footer class="bg-dark text-white py-4 mt-5">
+            <div class="container mt-4">
+                <div class="row text-center text-md-start">
+                    
+                    <div class="col-md-4 mb-3">
+                        <h5 class="fw-bold">My Dream Cards</h5>
+                        <p>Buat wishlist impianmu dengan Dream Card Generator kami yang mudah digunakan!
+          
+                          di rumah atau bagikan secara virtual kepada teman dan keluarga.</p>
+                    </div>
+          
+                    <div class="col-md-4 mb-3">
+                        <h5 class="fw-bold">Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="landing page.html" class="text-white text-decoration-none">Home</a></li>
+                            <li><a href="dreamcardgenerator.html" class="text-white text-decoration-none">Dream Card Generator</a></li> 
+                            <li><a href="templates.html" class="text-white text-decoration-none">Templates</a></li> 
+                            <li><a href="about.html" class="text-white text-decoration-none">About</a></li> 
+                        </ul>
+                    </div> 
+                  
+                    <div class="col-md-4 mb-3">
+                        <h5 class="fw-bold">Ikuti Kami</h5>
+                        <a href="#" class="text-white text-decoration-none d-block"><i class="bi bi-facebook me-2"></i><strong>Facebook :</strong> DreamCards_offical</a>
+                        <a href="#" class="text-white text-decoration-none d-block"><i class="bi bi-instagram me-2"></i><strong>Instagram :</strong> DreamCards_offical</a>
+                        <a href="#" class="text-white text-decoration-none d-block"><i class="bi bi-twitter me-2"></i><strong>Twitter :</strong> DreamCard_offical</a>
+                    </div>
+                </div>
+          
+                
+                <hr class="border-secondary">
+                <div class="text-center pb-3">
+                    <p class="mb-0">&copy; 2025 mydreamcards.com | All rights reserved.</p>
+                </div>
+            </div>
+          </footer>
+
+              
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
