@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const db = require('../models/db'); // Koneksi ke MySQL
-const { verifyToken } = require('../middleware');
-const TargetController = require('../controllers/targetController');
+const db = require('./../models/db'); // Koneksi ke MySQL
+const { verifyToken } = require('./../middleware');
+const TargetController = require('./../controllers/targetController');
 require('dotenv').config();
 
 //Create Target
